@@ -5,6 +5,7 @@ import {
   DEFAULT_INPUT_TEMPLATE,
   DEFAULT_MODELS,
   DEFAULT_SIDEBAR_WIDTH,
+  SILICONFLOW_DEFAULT_MODEL,
   StoreKey,
 } from "../constant";
 import { createPersistStore } from "../utils/store";
@@ -46,7 +47,7 @@ export const DEFAULT_CONFIG = {
   models: DEFAULT_MODELS as any as LLMModel[],
 
   modelConfig: {
-    model: "gpt-3.5-turbo" as ModelType,
+    model: SILICONFLOW_DEFAULT_MODEL as ModelType,
     temperature: 0.5,
     top_p: 1,
     max_tokens: 4000,
@@ -132,7 +133,7 @@ export const useAppConfig = createPersistStore(
   }),
   {
     name: StoreKey.Config,
-    version: 3.8,
+    version: 3.9,
     migrate(persistedState, version) {
       const state = persistedState as ChatConfig;
 
@@ -161,6 +162,10 @@ export const useAppConfig = createPersistStore(
 
       if (version < 3.8) {
         state.lastUpdate = Date.now();
+      }
+
+      if (version < 3.9 && state.modelConfig.model.startsWith("gpt")) {
+        state.modelConfig.model = SILICONFLOW_DEFAULT_MODEL as ModelType;
       }
 
       return state as any;

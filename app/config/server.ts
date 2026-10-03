@@ -8,6 +8,7 @@ declare global {
 
       OPENAI_API_KEY?: string;
       CODE?: string;
+      ACCESS_CODE?: string; // alias of CODE, e.g. for Netlify where CODE is reserved by the build
 
       BASE_URL?: string;
       OPENAI_ORG_ID?: string; // openai only
@@ -37,8 +38,12 @@ declare global {
   }
 }
 
+// Netlify's build script uses a shell variable named CODE for its exit code,
+// so a user-defined CODE breaks the build there. ACCESS_CODE takes precedence.
+const ACCESS_CODE_ENV = process.env.ACCESS_CODE || process.env.CODE;
+
 const ACCESS_CODES = (function getAccessCodes(): Set<string> {
-  const code = process.env.CODE;
+  const code = ACCESS_CODE_ENV;
 
   try {
     const codes = (code?.split(",") ?? [])
@@ -49,6 +54,18 @@ const ACCESS_CODES = (function getAccessCodes(): Set<string> {
     return new Set();
   }
 })();
+
+// Clean up URLs pasted from chats/docs: strip invisible characters and
+// whitespace, and unwrap markdown links like "[https://a.com](https://a.com)".
+function sanitizeUrl(url?: string) {
+  if (!url) return url;
+  let cleaned = url.replace(/[\u200B-\u200D\u2060\uFEFF\s]/g, "");
+  const markdownLink = cleaned.match(/\[([^\]]*)\]\(([^)]*)\)?/);
+  if (markdownLink) {
+    cleaned = markdownLink[1] || markdownLink[2];
+  }
+  return cleaned || undefined;
+}
 
 export const getServerSideConfig = () => {
   if (typeof process === "undefined") {
@@ -79,23 +96,23 @@ export const getServerSideConfig = () => {
   );
 
   return {
-    baseUrl: process.env.BASE_URL,
+    baseUrl: sanitizeUrl(process.env.BASE_URL),
     apiKey,
     openaiOrgId: process.env.OPENAI_ORG_ID,
 
     isAzure,
-    azureUrl: process.env.AZURE_URL,
+    azureUrl: sanitizeUrl(process.env.AZURE_URL),
     azureApiKey: process.env.AZURE_API_KEY,
     azureApiVersion: process.env.AZURE_API_VERSION,
 
     isGoogle,
     googleApiKey: process.env.GOOGLE_API_KEY,
-    googleUrl: process.env.GOOGLE_URL,
+    googleUrl: sanitizeUrl(process.env.GOOGLE_URL),
 
     gtmId: process.env.GTM_ID,
 
     needCode: ACCESS_CODES.size > 0,
-    code: process.env.CODE,
+    code: ACCESS_CODE_ENV,
     codes: ACCESS_CODES,
 
     proxyUrl: process.env.PROXY_URL,

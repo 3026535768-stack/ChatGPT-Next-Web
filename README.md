@@ -162,6 +162,10 @@ After adding or modifying this environment variable, please redeploy the project
 
 Access password, separated by comma.
 
+### `ACCESS_CODE` (optional)
+
+Alias of `CODE`; takes precedence when both are set. Use this on Netlify, where a `CODE` variable conflicts with the build script and fails the deploy.
+
 ### `OPENAI_API_KEY` (required)
 
 Your openai api key, join multiple api keys with comma.
