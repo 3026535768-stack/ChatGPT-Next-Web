@@ -105,6 +105,8 @@ Latex block: $$e=mc^2$$
 
 export const SUMMARIZE_MODEL = "gpt-3.5-turbo";
 export const GEMINI_SUMMARIZE_MODEL = "gemini-pro";
+// SiliconFlow does not serve OpenAI models, so default to one of its free models
+export const SILICONFLOW_DEFAULT_MODEL = "Qwen/Qwen2.5-7B-Instruct";
 
 export const KnowledgeCutOffDate: Record<string, string> = {
   default: "2021-09",
@@ -118,6 +120,42 @@ export const KnowledgeCutOffDate: Record<string, string> = {
 };
 
 export const DEFAULT_MODELS = [
+  {
+    name: "Qwen/Qwen2.5-7B-Instruct",
+    available: true,
+    provider: {
+      id: "siliconflow",
+      providerName: "SiliconFlow",
+      providerType: "openai",
+    },
+  },
+  {
+    name: "THUDM/glm-4-9b-chat",
+    available: true,
+    provider: {
+      id: "siliconflow",
+      providerName: "SiliconFlow",
+      providerType: "openai",
+    },
+  },
+  {
+    name: "deepseek-ai/DeepSeek-V3",
+    available: true,
+    provider: {
+      id: "siliconflow",
+      providerName: "SiliconFlow",
+      providerType: "openai",
+    },
+  },
+  {
+    name: "deepseek-ai/DeepSeek-R1",
+    available: true,
+    provider: {
+      id: "siliconflow",
+      providerName: "SiliconFlow",
+      providerType: "openai",
+    },
+  },
   {
     name: "gpt-4",
     available: true,
